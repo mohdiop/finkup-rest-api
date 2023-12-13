@@ -18,15 +18,15 @@ class FinkController {
     private lateinit var finkService: FinkService
 
     @GetMapping("/")
-    fun successToConnect() = "Connect to server successfully"
+    fun successToConnect() = finkService.connect()
 
     @PostMapping("/addFink")
-    fun addFink(@RequestBody fink: Fink): Fink {
+    fun addFink(@RequestBody fink: Fink): String {
         return finkService.saveFink(fink)
     }
 
     @PostMapping("/addFinks")
-    fun addFinks(@RequestBody finks: List<Fink>): List<Fink> {
+    fun addFinks(@RequestBody finks: List<Fink>): String {
         return finkService.saveFinks(finks)
     }
 
@@ -41,18 +41,18 @@ class FinkController {
     }
 
     @GetMapping("/finkTitle/{title}")
-    fun findFinkByTitle(@PathVariable title: String): Fink {
+    fun findFinkByTitle(@PathVariable title: String): List<Fink> {
         return finkService.getFinkByTitle(title)
     }
 
     @GetMapping("/finkContent/{content}")
-    fun findFinkByContent(@PathVariable content: String): Fink {
+    fun findFinkByContent(@PathVariable content: String): List<Fink> {
         return finkService.getFinkByContent(content)
     }
 
     @PutMapping("/update")
-    fun updateFink(@RequestBody fink: Fink): Fink {
-        return finkService.updateFink(fink)!!
+    fun updateFink(@RequestBody fink: Fink): String {
+        return finkService.updateFink(fink)
     }
 
     @DeleteMapping("/delete/{id}")
@@ -61,7 +61,7 @@ class FinkController {
     }
 
     @DeleteMapping("/delete")
-    fun deleteAllFinks(): String{
+    fun deleteAllFinks(): String {
         return finkService.deleteAllFinks()
     }
 }

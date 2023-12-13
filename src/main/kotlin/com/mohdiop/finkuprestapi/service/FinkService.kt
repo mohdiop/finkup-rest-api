@@ -10,12 +10,16 @@ class FinkService {
     @Autowired
     private lateinit var finkRepository: FinkRepository
 
-    fun saveFink(fink: Fink): Fink {
-        return finkRepository.save(fink)
+    fun connect() = "Connect to server successfully!"
+
+    fun saveFink(fink: Fink): String {
+        finkRepository.save(fink)
+        return "Fink added successfully!"
     }
 
-    fun saveFinks(finks: List<Fink>): List<Fink> {
-        return finkRepository.saveAll(finks)
+    fun saveFinks(finks: List<Fink>): String {
+        finkRepository.saveAll(finks)
+        return "All finks added successfully!"
     }
 
     fun getAllFinks(): List<Fink> {
@@ -26,33 +30,35 @@ class FinkService {
         return finkRepository.findById(id).orElse(null)
     }
 
-    fun getFinkByTitle(finkTitle: String): Fink {
+    fun getFinkByTitle(finkTitle: String): List<Fink> {
         return finkRepository.findByFinkTitle(finkTitle)
     }
 
-    fun getFinkByContent(finkContent: String): Fink {
+    fun getFinkByContent(finkContent: String): List<Fink> {
         return finkRepository.findByFinkContent(finkContent)
     }
 
-    fun updateFink(fink: Fink): Fink? {
+    fun updateFink(fink: Fink): String {
         val finkToUpdate = finkRepository.findById(fink.finkId).orElse(null)
         return if (finkToUpdate != null) {
             finkToUpdate.finkTitle = fink.finkTitle
             finkToUpdate.finkContent = fink.finkContent
             finkToUpdate.finkDate = fink.finkDate
             finkRepository.save(finkToUpdate)
+            "Fink updated successfully!"
         } else {
-            null
+            finkRepository.save(fink)
+            "This fink is not registered yet so it's been added!"
         }
     }
 
     fun deleteFink(id: Long): String {
         finkRepository.deleteById(id)
-        return "Fink deleted successfully"
+        return "Fink deleted successfully!"
     }
 
     fun deleteAllFinks(): String{
         finkRepository.deleteAll()
-        return "All finks are deleted successfully"
+        return "All finks are deleted successfully!"
     }
 }
