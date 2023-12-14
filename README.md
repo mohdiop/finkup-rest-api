@@ -2,7 +2,7 @@
 
 This project involves the development of a RESTful API used in the FinkUp application to store data on a server using Spring Boot and MySQL.
 
-It is attached to the https://github.com/mohdiop/finkup project
+It is attached to the https://github.com/mohdiop/finkup project.
 
 ## API Documentation
 **Note:** Operations are performed on the Fink object, the schema of which is given in the following Kotlin file:
@@ -29,8 +29,10 @@ It is attached to the https://github.com/mohdiop/finkup project
   The `finkDate` field is represented in milliseconds.
 
 **Base URL** : `http://localhost:port_number`.
-The `port_number` is `6874` by default you can change it as you want to an available port in the application.properties file `src/main/resources/application.properties`
-You can also change the properties to specify your MySQL database connexion config
+
+The `port_number` is `6874` by default you can change it as you want to an available port in the `application.properties` file **src/main/resources/application.properties**.
+
+You can also change the properties to specify your MySQL database connexion config:
 ```properties
 spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
 spring.datasource.url=jdbc:mysql://localhost:3306/finkup
@@ -74,13 +76,13 @@ server.port=6874
 - **Description :** Retrieves all Fink objects from the database.
 - **Response :** List of Fink objects.
 
-### Get a Fink by ID
+### Get a Fink by id
 
 - **Type :** GET
 - **Endpoint :** `/finkId/{id}`
-- **Description :** Retrieves a Fink object based on its ID.
+- **Description :** Retrieves a Fink object based on its id.
 - **Path Parameter :** `id` - ID of the Fink object.
-- **Response :** Fink object corresponding to the specified ID.
+- **Response :** Fink object corresponding to the specified id.
 
 ### Get a Fink by Title
 
@@ -108,12 +110,12 @@ server.port=6874
   - "Fink updated successfully!" if the Fink exists; otherwise,
   - "This fink is not added yet so it's been added!" and adds the Fink.
 
-### Delete a Fink by ID
+### Delete a Fink by id
 
 - **Type :** DELETE
 - **Endpoint :** `/delete/{id}`
-- **Description :** Deletes a Fink object from the database based on its ID.
-- **Path Parameter :** `id` - ID of the Fink object.
+- **Description :** Deletes a Fink object from the database based on its id.
+- **Path Parameter :** `id` - id of the Fink object.
 - **Response :** "Fink deleted successfully".
 
 ### Delete All Finks
@@ -122,3 +124,5 @@ server.port=6874
 - **Endpoint :** `/delete`
 - **Description :** Deletes all Fink objects from the database.
 - **Response :** "All finks deleted successfully!".
+
+Make sure to config your MySQL Server, create a database named **finkup** and start it before run the project.
