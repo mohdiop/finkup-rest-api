@@ -10,7 +10,6 @@ It is attached to the https://github.com/mohdiop/finkup project.
     @Table(name = "fink")
     data class Fink(
         @Id
-        @GeneratedValue
         var finkId: Long,
         var finkTitle: String,
         var finkContent: String,
