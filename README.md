@@ -2,6 +2,8 @@
 
 This project involves the development of a RESTful API used in the FinkUp application to store data on a server using Spring Boot and MySQL.
 
+It is attached to the https://github.com/mohdiop/finkup project
+
 ## API Documentation
 **Note:** Operations are performed on the Fink object, the schema of which is given in the following Kotlin file:
   ```kotlin
