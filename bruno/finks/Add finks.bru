@@ -1,0 +1,28 @@
+meta {
+  name: Add finks
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/users/1/finks/batch
+  body: json
+  auth: inherit
+}
+
+body:json {
+  [
+    {
+      "title": "My Second Fink",
+      "content": "Its content"
+    },
+    {
+      "title": "My Third Fink",
+      "content": "Its content"
+    }
+  ]
+}
+
+settings {
+  encodeUrl: true
+}

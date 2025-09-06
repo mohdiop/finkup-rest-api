@@ -1,0 +1,24 @@
+meta {
+  name: Add user
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/users
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "email": "example@example.com",
+    "password": "Ex@mple123",
+    "firstName": "First",
+    "lastName": "Last"
+  }
+}
+
+settings {
+  encodeUrl: true
+}

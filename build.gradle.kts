@@ -24,8 +24,16 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-web")
 	implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
 	implementation("org.jetbrains.kotlin:kotlin-reflect")
-	runtimeOnly("com.mysql:mysql-connector-j:9.4.0")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
+
+	// MySQL Connector
+	runtimeOnly("com.mysql:mysql-connector-j:9.4.0")
+
+	// Spring Validation
+	implementation("org.springframework.boot:spring-boot-starter-validation")
+
+	// Bcrypt
+	implementation("org.mindrot:jbcrypt:0.4")
 }
 
 kotlin {
