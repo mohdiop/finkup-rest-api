@@ -1,0 +1,15 @@
+meta {
+  name: Get fink
+  type: http
+  seq: 5
+}
+
+get {
+  url: {{baseUrl}}/users/1/finks/1
+  body: none
+  auth: inherit
+}
+
+settings {
+  encodeUrl: true
+}

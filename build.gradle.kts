@@ -1,24 +1,18 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-	id("org.springframework.boot") version "3.2.0"
-	id("io.spring.dependency-management") version "1.1.4"
-	kotlin("jvm") version "1.9.20"
-	kotlin("plugin.spring") version "1.9.20"
-	kotlin("plugin.jpa") version "1.9.20"
+	id("org.springframework.boot") version "3.5.5"
+	id("io.spring.dependency-management") version "1.1.7"
+	kotlin("jvm") version "2.2.0"
+	kotlin("plugin.spring") version "2.2.0"
+	kotlin("plugin.jpa") version "2.2.0"
 }
 
 group = "com.mohdiop"
-version = "0.0.1-SNAPSHOT"
+version = "1.0.0"
 
 java {
-	sourceCompatibility = JavaVersion.VERSION_17
-}
-
-configurations {
-	compileOnly {
-		extendsFrom(configurations.annotationProcessor.get())
-	}
+	sourceCompatibility = JavaVersion.VERSION_21
 }
 
 repositories {
@@ -29,18 +23,27 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 	implementation("org.springframework.boot:spring-boot-starter-web")
 	implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
-	implementation("mysql:mysql-connector-java:8.0.23")
 	implementation("org.jetbrains.kotlin:kotlin-reflect")
-	compileOnly("org.projectlombok:lombok")
-	runtimeOnly("com.mysql:mysql-connector-j")
-	annotationProcessor("org.projectlombok:lombok")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
+
+	// MySQL Connector
+	runtimeOnly("com.mysql:mysql-connector-j:9.4.0")
+
+	// Spring Validation
+	implementation("org.springframework.boot:spring-boot-starter-validation")
+
+	// Bcrypt
+	implementation("org.mindrot:jbcrypt:0.4")
+}
+
+kotlin {
+	jvmToolchain(21)
 }
 
 tasks.withType<KotlinCompile> {
-	kotlinOptions {
-		freeCompilerArgs += "-Xjsr305=strict"
-		jvmTarget = "17"
+	compilerOptions {
+		jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_21)
+		freeCompilerArgs.add("-Xjsr305=strict")
 	}
 }
 
