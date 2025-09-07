@@ -1,8 +1,8 @@
 package com.mohdiop.finkuprestapi.service
 
 import com.mohdiop.finkuprestapi.dto.request.CreateFinkRequest
-import com.mohdiop.finkuprestapi.dto.response.FinkResponse
 import com.mohdiop.finkuprestapi.dto.request.UpdateFinkRequest
+import com.mohdiop.finkuprestapi.dto.response.FinkResponse
 import com.mohdiop.finkuprestapi.dto.response.UserFinksResponse
 import com.mohdiop.finkuprestapi.entity.finkFromRequest
 import com.mohdiop.finkuprestapi.entity.toResponse
@@ -10,8 +10,9 @@ import com.mohdiop.finkuprestapi.entity.toUserResponse
 import com.mohdiop.finkuprestapi.repository.FinkRepository
 import com.mohdiop.finkuprestapi.repository.UserRepository
 import jakarta.persistence.EntityNotFoundException
-import org.springframework.stereotype.Service
 import org.springframework.security.access.AccessDeniedException
+import org.springframework.security.core.context.SecurityContextHolder
+import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 
 @Service
@@ -19,7 +20,10 @@ class FinkService(
     private val finkRepository: FinkRepository,
     private val userRepository: UserRepository
 ) {
-    fun createFink(userId: Long, createFinkRequest: CreateFinkRequest): FinkResponse {
+    fun createFink(createFinkRequest: CreateFinkRequest): FinkResponse {
+        val userId =
+            Integer.valueOf(SecurityContextHolder.getContext().authentication.principal.toString())
+                .toLong()
         val user = getUserOrThrowException(userId)
         val finkToSave = finkFromRequest(createFinkRequest)
         finkToSave.finkUser = user
@@ -57,7 +61,7 @@ class FinkService(
             ?.let { newContent ->
                 finkToUpdate.finkContent = newContent
             }
-        if(updateFinkRequest.title != null || updateFinkRequest.content != null) {
+        if (updateFinkRequest.title != null || updateFinkRequest.content != null) {
             finkToUpdate.finkLastUpdatedAt = LocalDateTime.now()
         }
         return finkRepository.save(

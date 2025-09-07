@@ -8,6 +8,7 @@ import com.mohdiop.finkuprestapi.entity.userFromRequest
 import com.mohdiop.finkuprestapi.repository.UserRepository
 import jakarta.persistence.EntityExistsException
 import jakarta.persistence.EntityNotFoundException
+import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.crypto.bcrypt.BCrypt
 import org.springframework.stereotype.Service
 
@@ -73,4 +74,13 @@ class UserService(
         return userRepository.findAll()
             .map { user -> user.toResponse() }
     }
+
+    fun getCurrentUserInfo(): UserResponse {
+        val userId = getUserIdFromSecurityContext()
+        return userRepository.findById(userId)
+            .orElseThrow { EntityNotFoundException("Utilisateur introuvable.") }
+            .toResponse()
+    }
+
+    fun getUserIdFromSecurityContext() = Integer.valueOf(SecurityContextHolder.getContext().authentication.principal.toString()).toLong()
 }

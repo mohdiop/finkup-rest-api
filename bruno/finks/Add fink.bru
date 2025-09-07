@@ -5,9 +5,13 @@ meta {
 }
 
 post {
-  url: {{baseUrl}}/users/1/finks
+  url: {{baseUrl}}/users/finks
   body: json
-  auth: inherit
+  auth: bearer
+}
+
+auth:bearer {
+  token: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIyIiwidHlwZSI6IkFDQ0VTU19UT0tFTiIsImlhdCI6MTc1NzIzMDcyNCwiZXhwIjoxNzU3MjMxNjI0fQ.hR63slkeqD9YTzyJHKF7ZT-phOOWcME4pyzcjkmzxA8
 }
 
 body:json {

@@ -1,5 +1,6 @@
 package com.mohdiop.finkuprestapi.exception
 
+import io.jsonwebtoken.ExpiredJwtException
 import io.jsonwebtoken.JwtException
 import jakarta.persistence.EntityExistsException
 import jakarta.persistence.EntityNotFoundException
@@ -47,14 +48,19 @@ class ExceptionsHandler {
 
     @ExceptionHandler(BadCredentialsException::class)
     fun handleBadCredentialsException(exception: BadCredentialsException): ResponseEntity<String> {
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-            .body(exception.message)
+        return ResponseEntity.badRequest().body(exception.message)
     }
 
     @ExceptionHandler(JwtException::class)
     fun handleJwtException(exception: JwtException): ResponseEntity<String> {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-            .body("Token expiré ou invalide.")
+            .body("Token invalide.")
+    }
+
+    @ExceptionHandler(ExpiredJwtException::class)
+    fun handleExpiredJwtException(exception: ExpiredJwtException): ResponseEntity<String> {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+            .body("Token expiré.")
     }
 
 }

@@ -1,5 +1,6 @@
 package com.mohdiop.finkuprestapi.security
 
+import com.mohdiop.finkuprestapi.entity.enum.Role
 import io.jsonwebtoken.Claims
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.security.Keys
@@ -22,23 +23,24 @@ class JwtService(
         REFRESH_TOKEN
     }
 
-    private fun generateToken(userId: Long, tokenType: TokenType, expiryAt: Long): String {
+    private fun generateToken(userId: Long, tokenType: TokenType, expiryAt: Long, userRoles: MutableSet<Role>): String {
         val now = Date.from(Instant.now())
         val expirationDate = Date(now.time + expiryAt)
         return Jwts.builder()
             .subject(userId.toString())
             .claim("type", tokenType.name)
+            .claim("roles", userRoles.map { it.name })
             .issuedAt(now)
             .expiration(expirationDate)
             .signWith(secretKey, Jwts.SIG.HS256)
             .compact()
     }
 
-    fun generateAccessToken(userId: Long) =
-        generateToken(userId, TokenType.ACCESS_TOKEN, accessTokenValidityMs)
+    fun generateAccessToken(userId: Long, userRoles: MutableSet<Role>) =
+        generateToken(userId, TokenType.ACCESS_TOKEN, accessTokenValidityMs, userRoles)
 
-    fun generateRefreshToken(userId: Long) =
-        generateToken(userId, TokenType.REFRESH_TOKEN, refreshTokenValidityMs)
+    fun generateRefreshToken(userId: Long, userRoles: MutableSet<Role>) =
+        generateToken(userId, TokenType.REFRESH_TOKEN, refreshTokenValidityMs, userRoles)
 
     fun isValidAccessToken(accessToken: String): Boolean {
         val claims = parseAllClaims(accessToken) ?: return false
@@ -57,11 +59,15 @@ class JwtService(
         return claims.subject.toLong()
     }
 
+    fun getUserRolesFromToken(token: String): MutableSet<Role> {
+        val claims = parseAllClaims(token) ?: throw IllegalArgumentException("Token invalide")
+        return (claims["roles"] as List<*>).map { Role.valueOf(it.toString()) }.toMutableSet()
+    }
+
     private fun parseAllClaims(token: String): Claims? {
         val rawToken = if (token.startsWith("Bearer "))
             token.removePrefix("Bearer ")
         else token
-        println(token)
         return Jwts.parser()
                 .verifyWith(secretKey)
                 .build()

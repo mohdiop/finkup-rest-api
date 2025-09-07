@@ -30,8 +30,8 @@ class AuthenticationService(
         val userToAuthenticate = userRepository.findUserByUserEmail(authenticationRequest.email)
             .orElseThrow { BadCredentialsException("Email ou mot de passe incorrect.") }
         if (BCrypt.checkpw(authenticationRequest.password, userToAuthenticate.userPassword)) {
-            val newAccessToken = jwtService.generateAccessToken(userToAuthenticate.userId)
-            val newRefreshToken = jwtService.generateRefreshToken(userToAuthenticate.userId)
+            val newAccessToken = jwtService.generateAccessToken(userToAuthenticate.userId, userToAuthenticate.userRoles)
+            val newRefreshToken = jwtService.generateRefreshToken(userToAuthenticate.userId, userToAuthenticate.userRoles)
             storeRefreshToken(userToAuthenticate.userId, newRefreshToken)
             return TokenPairResponse(
                 newAccessToken,
@@ -51,13 +51,11 @@ class AuthenticationService(
             .orElseThrow { JwtException("") }
         val hashedToken = hashToken(refreshToken)
         refreshTokenRepository
-            .findByUserIdAndToken(user.userId, hashedToken)
+            .findByUserUserIdAndToken(user.userId, hashedToken)
             .orElseThrow { JwtException("") }
-        refreshTokenRepository
-            .deleteByUserIdAndToken(user.userId, hashedToken)
 
-        val newAccessToken = jwtService.generateAccessToken(user.userId)
-        val newRefreshToken = jwtService.generateRefreshToken(user.userId)
+        val newAccessToken = jwtService.generateAccessToken(user.userId, user.userRoles)
+        val newRefreshToken = jwtService.generateRefreshToken(user.userId, user.userRoles)
         storeRefreshToken(user.userId, newRefreshToken)
         return TokenPairResponse(
             newAccessToken,
@@ -71,24 +69,20 @@ class AuthenticationService(
         val expiresAt = Instant.now().plusMillis(expiryMs)
         val user = userRepository.findById(userId)
             .orElseThrow { JwtException("") }
-        refreshTokenRepository.findByUserIdAndToken(userId, hashedToken)
-            .let {
-                if (it.isPresent) {
-                    val refreshToken = it.get()
-                    refreshToken.token = hashedToken
-                    refreshToken.expiresAt = expiresAt
-                    refreshTokenRepository.save(refreshToken)
-                } else {
-                    refreshTokenRepository.save(
-                        RefreshToken(
-                            userId = user.userId,
-                            user = user,
-                            expiresAt = expiresAt,
-                            token = hashedToken
-                        )
-                    )
-                }
-            }
+        println(userId)
+        val existingRefreshToken = refreshTokenRepository.findByUserUserId(userId)
+        val tokenToStore = existingRefreshToken.orElse(
+            RefreshToken(
+                user = user,
+                expiresAt = Instant.now(),
+                token = ""
+            )
+        )
+        tokenToStore.expiresAt = expiresAt
+        tokenToStore.token = hashedToken
+        refreshTokenRepository.save(
+            tokenToStore
+        )
     }
 
     private fun hashToken(token: String): String {
