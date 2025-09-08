@@ -6,11 +6,12 @@ import jakarta.persistence.EntityExistsException
 import jakarta.persistence.EntityNotFoundException
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.http.converter.HttpMessageNotReadableException
+import org.springframework.security.access.AccessDeniedException
+import org.springframework.security.authentication.BadCredentialsException
 import org.springframework.web.bind.MethodArgumentNotValidException
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestControllerAdvice
-import org.springframework.security.access.AccessDeniedException
-import org.springframework.security.authentication.BadCredentialsException
 
 @RestControllerAdvice
 class ExceptionsHandler {
@@ -37,7 +38,7 @@ class ExceptionsHandler {
 
     @ExceptionHandler(AccessDeniedException::class)
     fun handleAccessDeniedException(exception: AccessDeniedException): ResponseEntity<String> {
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
             .body(exception.message)
     }
 
@@ -61,6 +62,11 @@ class ExceptionsHandler {
     fun handleExpiredJwtException(exception: ExpiredJwtException): ResponseEntity<String> {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
             .body("Token expiré.")
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException::class)
+    fun handleHttpMessageNotReadableException(exception: HttpMessageNotReadableException): ResponseEntity<String> {
+        return ResponseEntity.badRequest().body("Requête malformée.")
     }
 
 }

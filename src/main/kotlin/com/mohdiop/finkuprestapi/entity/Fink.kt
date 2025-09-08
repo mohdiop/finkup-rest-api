@@ -2,20 +2,20 @@ package com.mohdiop.finkuprestapi.entity
 
 import com.mohdiop.finkuprestapi.dto.request.CreateFinkRequest
 import com.mohdiop.finkuprestapi.dto.response.FinkResponse
-import com.mohdiop.finkuprestapi.dto.response.UserFinksResponse
 import com.mohdiop.finkuprestapi.dto.response.UserResponse
+import com.mohdiop.finkuprestapi.dto.response.UserlessFinkResponse
+import com.mohdiop.finkuprestapi.entity.enum.Category
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
+import jakarta.persistence.EnumType
+import jakarta.persistence.Enumerated
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
 import jakarta.persistence.JoinColumn
 import jakarta.persistence.ManyToOne
 import jakarta.persistence.Table
-import java.time.LocalDate
 import java.time.LocalDateTime
-import kotlin.time.Clock
-import kotlin.time.Instant
 
 @Entity
 @Table(name = "finks")
@@ -23,6 +23,8 @@ data class Fink(
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY) var finkId: Long,
     @Column(nullable = false) var finkTitle: String,
     @Column(nullable = false) var finkContent: String,
+    @Enumerated(value = EnumType.STRING)
+    @Column(nullable = false) var finkCategory: Category,
     @Column(nullable = false) var finkCreatedAt: LocalDateTime,
     @Column(nullable = false) var finkLastUpdatedAt: LocalDateTime,
     @ManyToOne @JoinColumn(name = "fink_user_id") var finkUser: User
@@ -33,6 +35,7 @@ fun finkFromRequest(createFinkRequest: CreateFinkRequest): Fink {
         0L,
         createFinkRequest.title,
         createFinkRequest.content,
+        createFinkRequest.category,
         LocalDateTime.now(),
         LocalDateTime.now(),
         User()
@@ -44,6 +47,7 @@ fun Fink.toResponse(): FinkResponse {
         this.finkId,
         this.finkTitle,
         this.finkContent,
+        this.finkCategory,
         this.finkCreatedAt,
         this.finkLastUpdatedAt,
         UserResponse(
@@ -51,18 +55,19 @@ fun Fink.toResponse(): FinkResponse {
             this.finkUser.userEmail,
             this.finkUser.userFirstName,
             this.finkUser.userLastName,
-            this.finkUser.userCreatedAt
+            this.finkUser.userCreatedAt,
+            this.finkUser.userRoles
         )
     )
 }
 
-fun Fink.toUserResponse(): UserFinksResponse {
-    return UserFinksResponse(
+fun Fink.toUserlessResponse(): UserlessFinkResponse {
+    return UserlessFinkResponse(
         this.finkId,
         this.finkTitle,
         this.finkContent,
+        this.finkCategory,
         this.finkCreatedAt,
-        this.finkLastUpdatedAt,
-        this.finkUser.userId
+        this.finkLastUpdatedAt
     )
 }

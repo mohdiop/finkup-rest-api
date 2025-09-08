@@ -82,5 +82,7 @@ class UserService(
             .toResponse()
     }
 
-    fun getUserIdFromSecurityContext() = Integer.valueOf(SecurityContextHolder.getContext().authentication.principal.toString()).toLong()
+    fun getUserIdFromSecurityContext() =
+        Integer.valueOf(SecurityContextHolder.getContext().authentication.principal.toString())
+            .toLong()
 }

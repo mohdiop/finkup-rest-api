@@ -3,10 +3,10 @@ package com.mohdiop.finkuprestapi.service
 import com.mohdiop.finkuprestapi.dto.request.CreateFinkRequest
 import com.mohdiop.finkuprestapi.dto.request.UpdateFinkRequest
 import com.mohdiop.finkuprestapi.dto.response.FinkResponse
-import com.mohdiop.finkuprestapi.dto.response.UserFinksResponse
+import com.mohdiop.finkuprestapi.dto.response.UserlessFinkResponse
 import com.mohdiop.finkuprestapi.entity.finkFromRequest
 import com.mohdiop.finkuprestapi.entity.toResponse
-import com.mohdiop.finkuprestapi.entity.toUserResponse
+import com.mohdiop.finkuprestapi.entity.toUserlessResponse
 import com.mohdiop.finkuprestapi.repository.FinkRepository
 import com.mohdiop.finkuprestapi.repository.UserRepository
 import jakarta.persistence.EntityNotFoundException
@@ -20,17 +20,20 @@ class FinkService(
     private val finkRepository: FinkRepository,
     private val userRepository: UserRepository
 ) {
-    fun createFink(createFinkRequest: CreateFinkRequest): FinkResponse {
+    fun createFink(createFinkRequest: CreateFinkRequest): UserlessFinkResponse {
         val userId =
             Integer.valueOf(SecurityContextHolder.getContext().authentication.principal.toString())
                 .toLong()
         val user = getUserOrThrowException(userId)
         val finkToSave = finkFromRequest(createFinkRequest)
         finkToSave.finkUser = user
-        return finkRepository.save(finkToSave).toResponse()
+        return finkRepository.save(finkToSave).toUserlessResponse()
     }
 
-    fun createFinks(userId: Long, createFinkRequests: List<CreateFinkRequest>): List<FinkResponse> {
+    fun createFinks(
+        userId: Long,
+        createFinkRequests: List<CreateFinkRequest>
+    ): List<UserlessFinkResponse> {
         if (createFinkRequests.isEmpty()) {
             return emptyList()
         }
@@ -38,14 +41,14 @@ class FinkService(
         val finksToSave = createFinkRequests.map { requestFink -> finkFromRequest(requestFink) }
         finksToSave.forEach { it.finkUser = user }
         return finkRepository.saveAll(finksToSave)
-            .map { fink -> fink.toResponse() }
+            .map { fink -> fink.toUserlessResponse() }
     }
 
     fun updateFink(
         demanderId: Long,
         finkId: Long,
         updateFinkRequest: UpdateFinkRequest
-    ): FinkResponse {
+    ): UserlessFinkResponse {
         val demander = getUserOrThrowException(demanderId)
         val finkToUpdate = getFinkOrThrowException(finkId)
         if (demander.userId != finkToUpdate.finkUser.userId) {
@@ -61,13 +64,18 @@ class FinkService(
             ?.let { newContent ->
                 finkToUpdate.finkContent = newContent
             }
+        updateFinkRequest.category
+            ?.takeIf { it != finkToUpdate.finkCategory }
+            ?.let { newCategory ->
+                finkToUpdate.finkCategory = newCategory
+            }
         if (updateFinkRequest.title != null || updateFinkRequest.content != null) {
             finkToUpdate.finkLastUpdatedAt = LocalDateTime.now()
         }
         return finkRepository.save(
             finkToUpdate
         )
-            .toResponse()
+            .toUserlessResponse()
     }
 
     fun deleteFink(demanderId: Long, finkId: Long) {
@@ -81,19 +89,19 @@ class FinkService(
             }
     }
 
-    fun getFinkById(demanderId: Long, finkId: Long): FinkResponse {
+    fun getFinkById(demanderId: Long, finkId: Long): UserlessFinkResponse {
         return getFinkOrThrowException(finkId)
             .takeIf { it.finkUser.userId == demanderId }
             .let {
-                return@let it?.toResponse()
+                return@let it?.toUserlessResponse()
                     ?: throw AccessDeniedException("Fink non affichable par cet utilisateur.")
             }
     }
 
-    fun getFinksByUserId(userId: Long): List<UserFinksResponse> {
+    fun getFinksByUserId(userId: Long): List<UserlessFinkResponse> {
         getUserOrThrowException(userId)
         return finkRepository.findByFinkUserUserId(userId)
-            .map { fink -> fink.toUserResponse() }
+            .map { fink -> fink.toUserlessResponse() }
     }
 
     fun getAllFinks(): List<FinkResponse> {
