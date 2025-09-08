@@ -34,7 +34,10 @@ data class User(
     @CollectionTable(name = "user_roles", joinColumns = [JoinColumn(name = "user_id")])
     @Column(name = "role", nullable = false)
     @Enumerated(value = EnumType.STRING) val userRoles: MutableSet<Role> = mutableSetOf(Role.ROLE_USER),
-    @OneToMany(mappedBy = "finkUser", cascade = [CascadeType.ALL]) var userFinks: List<Fink> = emptyList(),
+    @OneToMany(
+        mappedBy = "finkUser",
+        cascade = [CascadeType.ALL]
+    ) var userFinks: List<Fink> = emptyList(),
     @OneToOne(mappedBy = "user", cascade = [CascadeType.ALL]) val refreshToken: RefreshToken? = null
 )
 
@@ -57,6 +60,7 @@ fun User.toResponse(): UserResponse {
         this.userEmail,
         this.userFirstName,
         this.userLastName,
-        this.userCreatedAt
+        this.userCreatedAt,
+        this.userRoles
     )
 }

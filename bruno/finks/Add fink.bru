@@ -7,17 +7,14 @@ meta {
 post {
   url: {{baseUrl}}/users/finks
   body: json
-  auth: bearer
-}
-
-auth:bearer {
-  token: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIyIiwidHlwZSI6IkFDQ0VTU19UT0tFTiIsImlhdCI6MTc1NzIzMDcyNCwiZXhwIjoxNzU3MjMxNjI0fQ.hR63slkeqD9YTzyJHKF7ZT-phOOWcME4pyzcjkmzxA8
+  auth: inherit
 }
 
 body:json {
   {
-    "title": "My First Fink",
-    "content": "Its content"
+    "title": "Fink API",
+    "content": "In the api, users can authenticate and access to their finks",
+    "category": "IDEA"
   }
 }
 

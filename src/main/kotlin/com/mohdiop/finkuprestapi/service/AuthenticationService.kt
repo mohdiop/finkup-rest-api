@@ -30,8 +30,14 @@ class AuthenticationService(
         val userToAuthenticate = userRepository.findUserByUserEmail(authenticationRequest.email)
             .orElseThrow { BadCredentialsException("Email ou mot de passe incorrect.") }
         if (BCrypt.checkpw(authenticationRequest.password, userToAuthenticate.userPassword)) {
-            val newAccessToken = jwtService.generateAccessToken(userToAuthenticate.userId, userToAuthenticate.userRoles)
-            val newRefreshToken = jwtService.generateRefreshToken(userToAuthenticate.userId, userToAuthenticate.userRoles)
+            val newAccessToken = jwtService.generateAccessToken(
+                userToAuthenticate.userId,
+                userToAuthenticate.userRoles
+            )
+            val newRefreshToken = jwtService.generateRefreshToken(
+                userToAuthenticate.userId,
+                userToAuthenticate.userRoles
+            )
             storeRefreshToken(userToAuthenticate.userId, newRefreshToken)
             return TokenPairResponse(
                 newAccessToken,

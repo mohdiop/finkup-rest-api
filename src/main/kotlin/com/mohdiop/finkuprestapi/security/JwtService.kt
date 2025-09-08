@@ -23,7 +23,12 @@ class JwtService(
         REFRESH_TOKEN
     }
 
-    private fun generateToken(userId: Long, tokenType: TokenType, expiryAt: Long, userRoles: MutableSet<Role>): String {
+    private fun generateToken(
+        userId: Long,
+        tokenType: TokenType,
+        expiryAt: Long,
+        userRoles: MutableSet<Role>
+    ): String {
         val now = Date.from(Instant.now())
         val expirationDate = Date(now.time + expiryAt)
         return Jwts.builder()
@@ -69,9 +74,9 @@ class JwtService(
             token.removePrefix("Bearer ")
         else token
         return Jwts.parser()
-                .verifyWith(secretKey)
-                .build()
-                .parseSignedClaims(rawToken)
-                .payload
+            .verifyWith(secretKey)
+            .build()
+            .parseSignedClaims(rawToken)
+            .payload
     }
 }

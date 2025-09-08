@@ -1,10 +1,10 @@
 package com.mohdiop.finkuprestapi.controller
 
 import com.mohdiop.finkuprestapi.dto.request.CreateFinkRequest
-import com.mohdiop.finkuprestapi.dto.response.FinkResponse
 import com.mohdiop.finkuprestapi.dto.request.UpdateFinkRequest
-import com.mohdiop.finkuprestapi.dto.response.UserFinksResponse
+import com.mohdiop.finkuprestapi.dto.response.UserlessFinkResponse
 import com.mohdiop.finkuprestapi.service.FinkService
+import com.mohdiop.finkuprestapi.service.UserService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.validation.annotation.Validated
@@ -20,62 +20,75 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 @RequestMapping("/api/v1/users")
 class FinkController(
-    private val finkService: FinkService
+    private val finkService: FinkService,
+    private val userService: UserService
 ) {
 
     @PostMapping("/finks")
     fun addFink(
         @Validated @RequestBody createFinkRequest: CreateFinkRequest
-    ): ResponseEntity<FinkResponse> {
+    ): ResponseEntity<UserlessFinkResponse> {
         return ResponseEntity.status(HttpStatus.CREATED)
             .body(finkService.createFink(createFinkRequest))
     }
 
-    @PostMapping("/{userId}/finks/batch")
+    @PostMapping("/finks/batch")
     fun addFinks(
-        @PathVariable userId: Long,
         @Validated @RequestBody createFinkRequests: List<CreateFinkRequest>
-    ): ResponseEntity<List<FinkResponse>> {
+    ): ResponseEntity<List<UserlessFinkResponse>> {
         return ResponseEntity.status(HttpStatus.CREATED)
-            .body(finkService.createFinks(userId, createFinkRequests))
+            .body(
+                finkService.createFinks(
+                    userService.getUserIdFromSecurityContext(),
+                    createFinkRequests
+                )
+            )
     }
 
-    @PatchMapping("/{userId}/finks/{finkId}")
+    @PatchMapping("/finks/{finkId}")
     fun updateFink(
-        @PathVariable userId: Long,
         @PathVariable finkId: Long,
         @Validated @RequestBody updateFinkRequest: UpdateFinkRequest
-    ): ResponseEntity<FinkResponse> {
-        return ResponseEntity.ok(finkService.updateFink(userId, finkId, updateFinkRequest))
+    ): ResponseEntity<UserlessFinkResponse> {
+        return ResponseEntity.ok(
+            finkService.updateFink(
+                userService.getUserIdFromSecurityContext(),
+                finkId,
+                updateFinkRequest
+            )
+        )
     }
 
-    @DeleteMapping("/{userId}/finks/{finkId}")
+    @DeleteMapping("/finks/{finkId}")
     fun deleteFink(
-        @PathVariable userId: Long,
         @PathVariable finkId: Long
     ): ResponseEntity<Unit> {
-        finkService.deleteFink(userId, finkId)
+        finkService.deleteFink(
+            userService.getUserIdFromSecurityContext(),
+            finkId
+        )
         return ResponseEntity.noContent().build()
     }
 
-    @GetMapping("/{userId}/finks")
-    fun getUserFinks(
-        @PathVariable userId: Long
-    ): ResponseEntity<List<UserFinksResponse>> {
-        return ResponseEntity.ok(finkService.getFinksByUserId(userId))
-    }
-
-    @GetMapping("/{userId}/finks/{finkId}")
-    fun getFinkById(
-        @PathVariable userId: Long,
-        @PathVariable finkId: Long
-    ): ResponseEntity<FinkResponse> {
-        return ResponseEntity.ok(finkService.getFinkById(userId, finkId))
-    }
-
     @GetMapping("/finks")
-    fun getAllFinks(): ResponseEntity<List<FinkResponse>> {
-        return ResponseEntity.ok(finkService.getAllFinks())
+    fun getUserFinks(): ResponseEntity<List<UserlessFinkResponse>> {
+        return ResponseEntity.ok(
+            finkService.getFinksByUserId(
+                userService.getUserIdFromSecurityContext()
+            )
+        )
+    }
+
+    @GetMapping("/finks/{finkId}")
+    fun getFinkById(
+        @PathVariable finkId: Long
+    ): ResponseEntity<UserlessFinkResponse> {
+        return ResponseEntity.ok(
+            finkService.getFinkById(
+                userService.getUserIdFromSecurityContext(),
+                finkId
+            )
+        )
     }
 
 }

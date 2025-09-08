@@ -23,7 +23,8 @@ class JwtAuthFilter(
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             if (jwtService.isValidAccessToken(authHeader)) {
                 val userId = jwtService.getUserIdFromToken(authHeader)
-                val authorities = jwtService.getUserRolesFromToken(authHeader).map { SimpleGrantedAuthority(it.name) }
+                val authorities = jwtService.getUserRolesFromToken(authHeader)
+                    .map { SimpleGrantedAuthority(it.name) }
                 val auth = UsernamePasswordAuthenticationToken(userId, null, authorities)
                 SecurityContextHolder.getContext().authentication = auth
             }
