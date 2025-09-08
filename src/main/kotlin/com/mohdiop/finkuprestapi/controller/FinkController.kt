@@ -23,13 +23,12 @@ class FinkController(
     private val finkService: FinkService
 ) {
 
-    @PostMapping("/{userId}/finks")
+    @PostMapping("/finks")
     fun addFink(
-        @PathVariable userId: Long,
         @Validated @RequestBody createFinkRequest: CreateFinkRequest
     ): ResponseEntity<FinkResponse> {
         return ResponseEntity.status(HttpStatus.CREATED)
-            .body(finkService.createFink(userId, createFinkRequest))
+            .body(finkService.createFink(createFinkRequest))
     }
 
     @PostMapping("/{userId}/finks/batch")

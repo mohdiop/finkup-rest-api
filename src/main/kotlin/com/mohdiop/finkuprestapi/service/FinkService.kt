@@ -1,8 +1,8 @@
 package com.mohdiop.finkuprestapi.service
 
 import com.mohdiop.finkuprestapi.dto.request.CreateFinkRequest
-import com.mohdiop.finkuprestapi.dto.response.FinkResponse
 import com.mohdiop.finkuprestapi.dto.request.UpdateFinkRequest
+import com.mohdiop.finkuprestapi.dto.response.FinkResponse
 import com.mohdiop.finkuprestapi.dto.response.UserFinksResponse
 import com.mohdiop.finkuprestapi.entity.finkFromRequest
 import com.mohdiop.finkuprestapi.entity.toResponse
@@ -10,20 +10,21 @@ import com.mohdiop.finkuprestapi.entity.toUserResponse
 import com.mohdiop.finkuprestapi.repository.FinkRepository
 import com.mohdiop.finkuprestapi.repository.UserRepository
 import jakarta.persistence.EntityNotFoundException
+import org.springframework.security.access.AccessDeniedException
+import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Service
-import java.nio.file.AccessDeniedException
 import java.time.LocalDateTime
-import kotlin.time.Clock
-import kotlin.time.Instant
 
 @Service
 class FinkService(
     private val finkRepository: FinkRepository,
     private val userRepository: UserRepository
 ) {
-    fun createFink(userId: Long, createFinkRequest: CreateFinkRequest): FinkResponse {
-        val user = userRepository.findById(userId)
-            .orElseThrow { EntityNotFoundException("Utilisateur introuvable!") }
+    fun createFink(createFinkRequest: CreateFinkRequest): FinkResponse {
+        val userId =
+            Integer.valueOf(SecurityContextHolder.getContext().authentication.principal.toString())
+                .toLong()
+        val user = getUserOrThrowException(userId)
         val finkToSave = finkFromRequest(createFinkRequest)
         finkToSave.finkUser = user
         return finkRepository.save(finkToSave).toResponse()
@@ -33,8 +34,7 @@ class FinkService(
         if (createFinkRequests.isEmpty()) {
             return emptyList()
         }
-        val user = userRepository.findById(userId)
-            .orElseThrow { EntityNotFoundException("Utilisateur introuvable!") }
+        val user = getUserOrThrowException(userId)
         val finksToSave = createFinkRequests.map { requestFink -> finkFromRequest(requestFink) }
         finksToSave.forEach { it.finkUser = user }
         return finkRepository.saveAll(finksToSave)
@@ -46,10 +46,8 @@ class FinkService(
         finkId: Long,
         updateFinkRequest: UpdateFinkRequest
     ): FinkResponse {
-        val demander = userRepository.findById(demanderId)
-            .orElseThrow { EntityNotFoundException("Utilisateur introuvable!") }
-        val finkToUpdate = finkRepository.findById(finkId)
-            .orElseThrow { throw EntityNotFoundException("Fink introuvable!") }
+        val demander = getUserOrThrowException(demanderId)
+        val finkToUpdate = getFinkOrThrowException(finkId)
         if (demander.userId != finkToUpdate.finkUser.userId) {
             throw AccessDeniedException("Fink non modifiable par cet utilisateur!")
         }
@@ -63,7 +61,7 @@ class FinkService(
             ?.let { newContent ->
                 finkToUpdate.finkContent = newContent
             }
-        if(updateFinkRequest.title != null || updateFinkRequest.content != null) {
+        if (updateFinkRequest.title != null || updateFinkRequest.content != null) {
             finkToUpdate.finkLastUpdatedAt = LocalDateTime.now()
         }
         return finkRepository.save(
@@ -75,7 +73,12 @@ class FinkService(
     fun deleteFink(demanderId: Long, finkId: Long) {
         getFinkOrThrowException(finkId)
             .takeIf { it.finkUser.userId == demanderId }
-            .let { return@let if (it != null) finkRepository.deleteById(finkId) else throw AccessDeniedException("Fink non supprimable par cet utilisateur!") }
+            .let {
+                return@let if (it != null)
+                    finkRepository.deleteById(finkId)
+                else
+                    throw AccessDeniedException("Fink non supprimable par cet utilisateur.")
+            }
     }
 
     fun getFinkById(demanderId: Long, finkId: Long): FinkResponse {
@@ -83,7 +86,7 @@ class FinkService(
             .takeIf { it.finkUser.userId == demanderId }
             .let {
                 return@let it?.toResponse()
-                    ?: throw AccessDeniedException("Fink non affichable par cet utilisateur!")
+                    ?: throw AccessDeniedException("Fink non affichable par cet utilisateur.")
             }
     }
 
@@ -100,9 +103,9 @@ class FinkService(
 
     private fun getUserOrThrowException(userId: Long) =
         userRepository.findById(userId)
-            .orElseThrow { EntityNotFoundException("Utilisateur introuvable!") }
+            .orElseThrow { EntityNotFoundException("Utilisateur introuvable.") }
 
     private fun getFinkOrThrowException(finkId: Long) =
         finkRepository.findById(finkId)
-            .orElseThrow { EntityNotFoundException("Fink introuvable!") }
+            .orElseThrow { EntityNotFoundException("Fink introuvable.") }
 }

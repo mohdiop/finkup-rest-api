@@ -8,7 +8,8 @@ import com.mohdiop.finkuprestapi.entity.userFromRequest
 import com.mohdiop.finkuprestapi.repository.UserRepository
 import jakarta.persistence.EntityExistsException
 import jakarta.persistence.EntityNotFoundException
-import org.mindrot.jbcrypt.BCrypt
+import org.springframework.security.core.context.SecurityContextHolder
+import org.springframework.security.crypto.bcrypt.BCrypt
 import org.springframework.stereotype.Service
 
 @Service
@@ -18,7 +19,7 @@ class UserService(
 
     fun createUser(createUserRequest: CreateUserRequest): UserResponse {
         if (userRepository.findUserByUserEmail(createUserRequest.email).isPresent) {
-            throw EntityExistsException("Email déjà utilisé par un utilisateur!")
+            throw EntityExistsException("Email déjà utilisé par un utilisateur.")
         }
         return userRepository.save(
             userFromRequest(createUserRequest)
@@ -27,12 +28,12 @@ class UserService(
 
     fun updateUser(userId: Long, updateUserRequest: UpdateUserRequest): UserResponse {
         val userToUpdate = userRepository.findById(userId)
-            .orElseThrow { EntityNotFoundException("Utilisateur introuvable!") }
+            .orElseThrow { EntityNotFoundException("Utilisateur introuvable.") }
         updateUserRequest.email
             ?.takeIf { it != userToUpdate.userEmail }
             ?.let { newEmail ->
                 if (userRepository.findUserByUserEmail(newEmail).isPresent) {
-                    throw EntityExistsException("Email déjà utilisé par un utilisateur!")
+                    throw EntityExistsException("Email déjà utilisé par un utilisateur.")
                 }
                 userToUpdate.userEmail = newEmail
             }
@@ -60,12 +61,12 @@ class UserService(
             userRepository.deleteById(userId)
             return
         }
-        throw EntityNotFoundException("Utilisateur introuvable!")
+        throw EntityNotFoundException("Utilisateur introuvable.")
     }
 
     fun getUserById(userId: Long): UserResponse {
         return userRepository.findById(userId)
-            .orElseThrow { EntityNotFoundException("Utilisateur introuvable!") }
+            .orElseThrow { EntityNotFoundException("Utilisateur introuvable.") }
             .toResponse()
     }
 
@@ -73,4 +74,13 @@ class UserService(
         return userRepository.findAll()
             .map { user -> user.toResponse() }
     }
+
+    fun getCurrentUserInfo(): UserResponse {
+        val userId = getUserIdFromSecurityContext()
+        return userRepository.findById(userId)
+            .orElseThrow { EntityNotFoundException("Utilisateur introuvable.") }
+            .toResponse()
+    }
+
+    fun getUserIdFromSecurityContext() = Integer.valueOf(SecurityContextHolder.getContext().authentication.principal.toString()).toLong()
 }

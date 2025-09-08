@@ -26,14 +26,19 @@ dependencies {
 	implementation("org.jetbrains.kotlin:kotlin-reflect")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 
+	// Spring Security
+	implementation("org.springframework.boot:spring-boot-starter-security")
+
+	// JWT
+	implementation("io.jsonwebtoken:jjwt-api:0.13.0")
+	implementation("io.jsonwebtoken:jjwt-impl:0.13.0")
+	implementation("io.jsonwebtoken:jjwt-jackson:0.13.0")
+
 	// MySQL Connector
 	runtimeOnly("com.mysql:mysql-connector-j:9.4.0")
 
 	// Spring Validation
 	implementation("org.springframework.boot:spring-boot-starter-validation")
-
-	// Bcrypt
-	implementation("org.mindrot:jbcrypt:0.4")
 }
 
 kotlin {
