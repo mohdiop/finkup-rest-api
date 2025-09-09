@@ -9,7 +9,7 @@ plugins {
 }
 
 group = "com.mohdiop"
-version = "1.0.0"
+version = providers.environmentVariable("API_VERSION").toString()
 
 java {
 	sourceCompatibility = JavaVersion.VERSION_21
@@ -39,6 +39,10 @@ dependencies {
 
 	// Spring Validation
 	implementation("org.springframework.boot:spring-boot-starter-validation")
+
+	// Swagger
+	implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.13")
+
 }
 
 kotlin {
