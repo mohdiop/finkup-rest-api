@@ -16,7 +16,7 @@ class SecurityConfig(
     private val jwtAuthFilter: JwtAuthFilter,
     private val jwtAuthEntryPoint: JwtAuthEntryPoint,
     private val jwtAccessDeniedHandler: JwtAccessDeniedHandler,
-    @param:Value("\${frontend.url}")private val frontendUrl: String
+    @param:Value("\${frontend.url}") private val frontendUrl: String
 ) {
 
     @Bean
@@ -26,7 +26,7 @@ class SecurityConfig(
             .sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }
             .authorizeHttpRequests { auth ->
                 auth
-                    .requestMatchers("/api/info")
+                    .requestMatchers("/api/*")
                     .permitAll()
                     .requestMatchers("/api/v1/auth/**")
                     .permitAll()

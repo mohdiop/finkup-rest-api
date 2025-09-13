@@ -69,4 +69,10 @@ class ExceptionsHandler {
         return ResponseEntity.badRequest().body("Requête malformée.")
     }
 
+    @ExceptionHandler(RuntimeException::class)
+    fun handleRuntimeException(exception: RuntimeException): ResponseEntity<String> {
+        return ResponseEntity.internalServerError()
+            .body("Un problème est survenu de notre côté. Veuillez réessayer plus tard.")
+    }
+
 }
