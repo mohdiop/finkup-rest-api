@@ -18,7 +18,8 @@ import java.time.LocalDateTime
 @Service
 class FinkService(
     private val finkRepository: FinkRepository,
-    private val userRepository: UserRepository
+    private val userRepository: UserRepository,
+    private val finkAIService: FinkAIService
 ) {
     fun createFink(createFinkRequest: CreateFinkRequest): UserlessFinkResponse {
         val userId =
@@ -107,6 +108,32 @@ class FinkService(
     fun getAllFinks(): List<FinkResponse> {
         return finkRepository.findAll()
             .map { fink -> fink.toResponse() }
+    }
+
+    private fun treatFink(
+        demanderId: Long,
+        finkId: Long,
+        treatmentType: FinkAIService.TreatmentType
+    ): String {
+        val finkFound = getFinkOrThrowException(finkId)
+        val demander = getUserOrThrowException(demanderId)
+        if (finkFound.finkUser.userId != demander.userId) {
+            throw AccessDeniedException("Fink non traitable par cet utilisateur.")
+        }
+        val treatedFinkContent = finkAIService.treatFink(
+            finkFound.finkContent,
+            finkFound.finkCategory,
+            treatmentType
+        )
+        return treatedFinkContent ?: "Impossible de traiter ce fink. Veuillez réessayer plus tard."
+    }
+
+    fun resumeFink(demanderId: Long, finkId: Long): String {
+        return treatFink(demanderId, finkId, FinkAIService.TreatmentType.RESUME)
+    }
+
+    fun developFink(demanderId: Long, finkId: Long): String {
+        return treatFink(demanderId, finkId, FinkAIService.TreatmentType.DEVELOPMENT)
     }
 
     private fun getUserOrThrowException(userId: Long) =

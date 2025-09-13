@@ -1,11 +1,11 @@
 meta {
-  name: Delete fink
+  name: Develop fink
   type: http
-  seq: 4
+  seq: 8
 }
 
-delete {
-  url: {{baseUrl}}/users/finks/1
+post {
+  url: {{baseUrl}}/users/finks/1/developed
   body: none
   auth: inherit
 }

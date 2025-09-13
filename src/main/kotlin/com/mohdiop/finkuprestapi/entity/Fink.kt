@@ -22,7 +22,7 @@ import java.time.LocalDateTime
 data class Fink(
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY) var finkId: Long,
     @Column(nullable = false) var finkTitle: String,
-    @Column(nullable = false) var finkContent: String,
+    @Column(nullable = false, columnDefinition = "TEXT") var finkContent: String,
     @Enumerated(value = EnumType.STRING)
     @Column(nullable = false) var finkCategory: Category,
     @Column(nullable = false) var finkCreatedAt: LocalDateTime,

@@ -45,6 +45,30 @@ class FinkController(
             )
     }
 
+    @PostMapping("/finks/{finkId}/resumed")
+    fun resumeFink(
+        @PathVariable finkId: Long
+    ): ResponseEntity<String> {
+        return ResponseEntity.ok(
+            finkService.resumeFink(
+                userService.getUserIdFromSecurityContext(),
+                finkId
+            )
+        )
+    }
+
+    @PostMapping("/finks/{finkId}/developed")
+    fun developFink(
+        @PathVariable finkId: Long
+    ): ResponseEntity<String> {
+        return ResponseEntity.ok(
+            finkService.developFink(
+                userService.getUserIdFromSecurityContext(),
+                finkId
+            )
+        )
+    }
+
     @PatchMapping("/finks/{finkId}")
     fun updateFink(
         @PathVariable finkId: Long,

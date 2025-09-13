@@ -8,5 +8,6 @@ enum class Category {
     WORK,
     COOKING,
     TRIP,
-    SHOPPING
+    SHOPPING,
+    HEALTH
 }

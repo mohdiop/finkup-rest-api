@@ -9,14 +9,16 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 @RequestMapping("/api")
 class ApiController(
-    @param:Value("\${api.version}") private val apiVersion: String
-){
+    @param:Value("\${api.version}") private val apiVersion: String,
+    @param:Value("\${fink-ai.model}") private val model: String
+) {
     @GetMapping("/info")
     fun getApiInformation(): ResponseEntity<Map<String, String>> {
         return ResponseEntity.ok(
             mapOf(
                 "name" to "FinkUp API",
-                "version" to apiVersion
+                "version" to apiVersion,
+                "finkAi" to "Powered by $model"
             )
         )
     }

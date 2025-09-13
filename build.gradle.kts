@@ -43,6 +43,9 @@ dependencies {
 	// Swagger
 	implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.13")
 
+	// WebFlux
+	implementation("org.springframework:spring-webflux")
+
 }
 
 kotlin {
