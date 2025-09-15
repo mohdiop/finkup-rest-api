@@ -9,5 +9,5 @@ data class UserResponse(
     val firstName: String,
     val lastName: String,
     val createdAt: LocalDateTime,
-    val userRoles: MutableSet<Role>
+    val roles: MutableSet<Role>
 )
