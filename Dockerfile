@@ -10,7 +10,7 @@ WORKDIR /app
 # - gradle.properties (si utilisé) : Propriétés globales
 # - gradlew et gradle/wrapper : Le wrapper Gradle pour garantir la version
 # **ATTENTION** : Assurez-vous que ces fichiers existent dans votre répertoire local.
-COPY build.gradle.kts settings.gradle.kts gradle.properties gradlew ./
+COPY build.gradle.kts settings.gradle.kts gradlew ./
 COPY gradle ./gradle
 
 # Télécharger les dépendances pour les mettre en cache.
