@@ -32,7 +32,7 @@ WORKDIR /app
 # Le nom exact du fichier peut varier (souvent 'nom-du-projet-version.jar' ou 'nom-du-projet.jar').
 # Il faut ajuster le nom dans le 'COPY' si nécessaire.
 # Ici, nous supposons qu'un seul JAR exécutable est créé.
-COPY --from=build /app/build/libs/*.jar app.jar
+COPY --from=build /app/build/libs/finkup-rest-api-0.0.1-SNAPSHOT.jar app.jar
 
 # Exposer le port configuré par Render
 EXPOSE 6874
