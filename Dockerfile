@@ -4,18 +4,18 @@
 FROM gradle:8.7-jdk21 AS build
 WORKDIR /app
 
-# Copier les fichiers de configuration Gradle
 COPY build.gradle.kts settings.gradle.kts ./
 COPY gradle ./gradle
 COPY gradlew ./
 
-# Télécharger les dépendances à l’avance
+# 🔥 FIX PERMISSION
+RUN chmod +x gradlew
+
+# Télécharger les dépendances
 RUN ./gradlew dependencies --no-daemon || true
 
-# Copier le code source
 COPY src ./src
 
-# Build du projet
 RUN ./gradlew clean build -x test --no-daemon
 
 # -------------------------------------------------------
@@ -24,11 +24,8 @@ RUN ./gradlew clean build -x test --no-daemon
 FROM eclipse-temurin:21-jre-alpine
 WORKDIR /app
 
-# Copier le JAR généré
 COPY --from=build /app/build/libs/*.jar app.jar
 
-# Exposer le port
-EXPOSE 7878
+EXPOSE 6874
 
-# Démarrage
 ENTRYPOINT ["java", "-jar", "app.jar"]
